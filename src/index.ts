@@ -1,6 +1,10 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
-import { connectRedis } from './redisClient'; // Add this
+import { connectRedis } from './redisClient.js'; // Notice the .js
+import { rateLimiter } from './rateLimiter.js';   // Notice the .js
+
+dotenv.config();
+// ... rest of your code
 
 dotenv.config();
 
