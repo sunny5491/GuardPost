@@ -27,7 +27,8 @@ app.get('/health', (req: Request, res: Response) => {
 // The Proxy Route
 // We use '*' to capture any path the user types (e.g., /posts, /users, /todos)
 // These requests will be forwarded to the external API and cached.
-app.get('*', handleProxyRequest);
+// Replace the previous app.get('*') or app.get('/*') with this:
+app.get(/.* / , handleProxyRequest);
 
 // --- SERVER START ---
 app.listen(PORT, () => {
