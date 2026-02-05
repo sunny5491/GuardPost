@@ -1,8 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import redisClient from './redisClient.js'; // Note the .js extension
+import redisClient from './redisClient.js'; 
 
 const LIMIT = 5; // Maximum number of requests allowed
 const WINDOW_SIZE_IN_SECONDS = 60; // Time frame (1 minute)
+
+
 
 export const rateLimiter = async (req: Request, res: Response, next: NextFunction) => {
     // We use the user's IP address as the unique key in Redis

@@ -1,23 +1,39 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
-import { connectRedis } from './redisClient.js'; // Notice the .js
-import { rateLimiter } from './rateLimiter.js';   // Notice the .js
+import { connectRedis } from './redisClient.js';
+import { rateLimiter } from './rateLimiter.js';
+import { handleProxyRequest } from './proxy.js';
 
-dotenv.config();
-// ... rest of your code
-
+// Load environment variables from .env file
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Connect to Redis before starting the server
-connectRedis(); 
+// Initialize the Redis Connection
+connectRedis();
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('GuardPost Proxy is Running!');
+// --- MIDDLEWARE ---
+// This applies the Rate Limiter to every single incoming request
+app.use(rateLimiter);
+
+// --- ROUTES ---
+
+// Health Check Route (To verify the server is up)
+app.get('/health', (req: Request, res: Response) => {
+  res.json({ status: 'active', service: 'GuardPost Proxy' });
 });
 
+// The Proxy Route
+// We use '*' to capture any path the user types (e.g., /posts, /users, /todos)
+// These requests will be forwarded to the external API and cached.
+app.get('*', handleProxyRequest);
+
+// --- SERVER START ---
 app.listen(PORT, () => {
-  console.log(`[server]: Server is running at http://localhost:${PORT}`);
+  console.log(`
+  🛡️  GuardPost is running!
+  🚀 Server: http://localhost:${PORT}
+  📡 Proxying to: ${process.env.EXTERNAL_API_URL}
+  `);
 });
