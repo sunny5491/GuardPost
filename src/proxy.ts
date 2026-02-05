@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import axios from 'axios';
-import redisClient from './redisClient';
+import redisClient from './redisClient.js'; 
 
 export const handleProxyRequest = async (req: Request, res: Response) => {
     try {
