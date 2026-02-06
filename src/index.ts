@@ -14,27 +14,37 @@ const PORT = process.env.PORT || 3000;
 connectRedis();
 
 // --- MIDDLEWARE ---
+
 // This applies the Rate Limiter to every single incoming request
 app.use(rateLimiter);
 
 // --- ROUTES ---
 
-// Health Check Route (To verify the server is up)
+
+// 1. Health Check Route
+// We define this specifically so we can verify the server is alive
 app.get('/health', (req: Request, res: Response) => {
-  res.json({ status: 'active', service: 'GuardPost Proxy' });
+  res.json({ 
+    status: 'active', 
+    service: 'GuardPost Proxy',
+    timestamp: new Date().toISOString()
+  });
 });
 
-// The Proxy Route
-// We use '*' to capture any path the user types (e.g., /posts, /users, /todos)
-// These requests will be forwarded to the external API and cached.
-// Replace the previous app.get('*') or app.get('/*') with this:
-app.get(/.* / , handleProxyRequest);
+// 2. The Proxy Handler
+// By using app.use() without a string path, it catches EVERYTHING.
+// This acts as a "catch-all" for any endpoint (e.g., /posts, /users, /)
+app.use(handleProxyRequest);
 
 // --- SERVER START ---
+
+
+
 app.listen(PORT, () => {
   console.log(`
   🛡️  GuardPost is running!
-  🚀 Server: http://localhost:${PORT}
-  📡 Proxying to: ${process.env.EXTERNAL_API_URL}
+  🚀 Server:  http://localhost:${PORT}
+  🏥 Health:  http://localhost:${PORT}/health
+  📡 Proxying: ${process.env.EXTERNAL_API_URL}
   `);
 });
